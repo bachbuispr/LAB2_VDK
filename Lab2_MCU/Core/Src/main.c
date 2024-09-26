@@ -371,7 +371,7 @@ static void MX_GPIO_Init(void)
 const int MAX_LED = 4;
 int index_led = 0;
 int led_buffer [4] = {1 , 2 , 3 , 4};
-int counter = 50;
+int counter = 25;
 int count_sec = 100;
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 	if(count_sec <= 0){
@@ -380,7 +380,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 	}
 	//after 50 cycles, time is 0.5s
 	if (counter <= 0) {
-		counter = 50;
+		counter = 25;
 		update7SEG(index_led++);
 		if(index_led > 3)			index_led = 0;
 	}
