@@ -58,8 +58,6 @@ static void MX_TIM2_Init(void);
 /* USER CODE BEGIN 0 */
 
 
-
-
 void display7SEG(int counter){
 	if(counter == 0){
 			HAL_GPIO_WritePin(SEG_0_GPIO_Port, SEG_0_Pin, RESET);
@@ -238,7 +236,6 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -375,13 +372,19 @@ const int MAX_LED = 4;
 int index_led = 0;
 int led_buffer [4] = {1 , 2 , 3 , 4};
 int counter = 50;
+int count_sec = 100;
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
+	if(count_sec <= 0){
+		count_sec = 100;
+		HAL_GPIO_TogglePin(DOT_GPIO_Port, DOT_Pin);
+	}
 	//after 50 cycles, time is 0.5s
 	if (counter <= 0) {
 		counter = 50;
 		update7SEG(index_led++);
 		if(index_led > 3)			index_led = 0;
 	}
+	count_sec--;
 	counter--;
 }
 /* USER CODE END 4 */
