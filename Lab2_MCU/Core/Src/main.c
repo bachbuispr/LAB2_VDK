@@ -159,7 +159,6 @@ void update7SEG ( int index ) {
 			HAL_GPIO_WritePin(EN1_GPIO_Port, EN1_Pin, SET);
 			HAL_GPIO_WritePin(EN2_GPIO_Port, EN2_Pin, SET);
 			HAL_GPIO_WritePin(EN3_GPIO_Port, EN3_Pin, SET);
-			display7SEG(1);
 			index = 1;
  // Display the first 7 SEG with led_buffer [0]
 			break ;
@@ -168,7 +167,6 @@ void update7SEG ( int index ) {
 			HAL_GPIO_WritePin(EN0_GPIO_Port, EN0_Pin, SET);
 			HAL_GPIO_WritePin(EN2_GPIO_Port, EN2_Pin, SET);
 			HAL_GPIO_WritePin(EN3_GPIO_Port, EN3_Pin, SET);
-			display7SEG(2);
 			index = 2;
  // Display the second 7 SEG with led_buffer [1]
 			break ;
@@ -177,7 +175,6 @@ void update7SEG ( int index ) {
 			HAL_GPIO_WritePin(EN0_GPIO_Port, EN0_Pin, SET);
 			HAL_GPIO_WritePin(EN2_GPIO_Port, EN2_Pin, RESET);
 			HAL_GPIO_WritePin(EN3_GPIO_Port, EN3_Pin, SET);
-			display7SEG(3);
 			index = 3;
  // Display the third 7 SEG with led_buffer [2]
 			break ;
@@ -186,7 +183,6 @@ void update7SEG ( int index ) {
 			HAL_GPIO_WritePin(EN0_GPIO_Port, EN0_Pin, SET);
 			HAL_GPIO_WritePin(EN2_GPIO_Port, EN2_Pin, SET);
 			HAL_GPIO_WritePin(EN3_GPIO_Port, EN3_Pin, RESET);
-			display7SEG(0);
 			index = 0;
  // Display the forth 7 SEG with led_buffer [3]
 			break ;
@@ -204,6 +200,20 @@ int *updateClockBuffer(int hour, int minute){
 	return clock;
 }
 
+int timer0_counter = 0;
+int timer0_flag = 0;
+int TIMER_CYCLE = 10;
+void setTimer0(int duration){
+	timer0_counter = duration /TIMER_CYCLE;
+	timer0_flag = 0;
+}
+void timer_run(){
+	if(timer0_counter > 0){
+		timer0_counter--;
+	if(timer0_counter == 0)
+		timer0_flag = 1;
+	}
+}
 /* USER CODE END 0 */
 
 /**
@@ -242,34 +252,38 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-int hour = 15,  minute = 8, second = 20;
-
+  int hour = 12,  minute = 4, second = 24;
+  setTimer0(1000);
   while (1)
   {
     /* USER CODE END WHILE */
+	     /* USER CODE BEGIN 3 */
+	  if(timer0_flag == 1){
+		  setTimer0(1000);
+		  HAL_GPIO_TogglePin(LED_RED_GPIO_Port, LED_RED_Pin);
 	  second++;
 	  if(second >= 60){
-		  second = 0;
-		  minute++;
-	  }
+		 second = 0;
+	  	 minute++;
+	  	 	  }
 	  if(minute >= 60){
-		  second = 0;
-		  hour++;
-	  }
+	  	 second = 0;
+	  	 hour++;
+	  	 	  }
 	  if(hour >= 24){
-		  hour = 0;
-	  }
+	  	 hour = 0;
+	  	 	  }
 	  int *buffer;
-	  buffer = updateClockBuffer(hour, minute);
-	  led_buffer[0] = buffer[0];
-	  led_buffer[1] = buffer[1];
-	  led_buffer[2] = buffer[2];
-	  led_buffer[3] = buffer[3];
-	  HAL_Delay(1000);
-    /* USER CODE BEGIN 3 */
-  }
+	  	 buffer = updateClockBuffer(hour, minute);
+	  	 	  led_buffer[0] = buffer[0];
+	  	 	  led_buffer[1] = buffer[1];
+	  	 	  led_buffer[2] = buffer[2];
+	  	 	  led_buffer[3] = buffer[3];
+	  	  	  }
+  	  	  }
+
+	}
   /* USER CODE END 3 */
-}
 
 /**
   * @brief System Clock Configuration
@@ -398,35 +412,7 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-const int MAX_LED = 4;
-int index_led = 0;
-int counter = 25;
-int count_sec = 100;
-int time_index = 0;
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
-	if(count_sec <= 0){
-		count_sec = 100;
-		HAL_GPIO_TogglePin(DOT_GPIO_Port, DOT_Pin);
-	}
-	//after 50 cycles, time is 0.5s
-	if (counter <= 0) {
-		counter = 25;
-		if (index_led >= MAX_LED) {
-					index_led = 0;
-					time_index = 0;
-				}
-				update7SEG(index_led++);
-				update7SEG(led_buffer[time_index++]);
-	}
-	count_sec--;
-	counter--;
-}
-/* USER CODE END 4 */
 
-/**
-  * @brief  This function is executed in case of error occurrence.
-  * @retval None
-  */
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
@@ -438,6 +424,15 @@ void Error_Handler(void)
   /* USER CODE END Error_Handler_Debug */
 }
 
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
+	timer_run();
+}
+/* USER CODE END 4 */
+
+/**
+  * @brief  This function is executed in case of error occurrence.
+  * @retval None
+  */
 #ifdef  USE_FULL_ASSERT
 /**
   * @brief  Reports the name of the source file and the source line number
