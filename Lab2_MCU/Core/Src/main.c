@@ -152,14 +152,14 @@ void display7SEG(int counter){
 }
 
 
-void update7SEG ( int index ) {
+void update7SEG ( int index, int status ) {
 	switch ( index ) {
 		case 0:
 			HAL_GPIO_WritePin(EN0_GPIO_Port, EN0_Pin, RESET);
 			HAL_GPIO_WritePin(EN1_GPIO_Port, EN1_Pin, SET);
 			HAL_GPIO_WritePin(EN2_GPIO_Port, EN2_Pin, SET);
 			HAL_GPIO_WritePin(EN3_GPIO_Port, EN3_Pin, SET);
-			index = 1;
+			display7SEG(status);
  // Display the first 7 SEG with led_buffer [0]
 			break ;
 		case 1:
@@ -167,7 +167,7 @@ void update7SEG ( int index ) {
 			HAL_GPIO_WritePin(EN0_GPIO_Port, EN0_Pin, SET);
 			HAL_GPIO_WritePin(EN2_GPIO_Port, EN2_Pin, SET);
 			HAL_GPIO_WritePin(EN3_GPIO_Port, EN3_Pin, SET);
-			index = 2;
+			display7SEG(status);
  // Display the second 7 SEG with led_buffer [1]
 			break ;
 		case 2:
@@ -175,7 +175,7 @@ void update7SEG ( int index ) {
 			HAL_GPIO_WritePin(EN0_GPIO_Port, EN0_Pin, SET);
 			HAL_GPIO_WritePin(EN2_GPIO_Port, EN2_Pin, RESET);
 			HAL_GPIO_WritePin(EN3_GPIO_Port, EN3_Pin, SET);
-			index = 3;
+			display7SEG(status);
  // Display the third 7 SEG with led_buffer [2]
 			break ;
 		case 3:
@@ -183,7 +183,7 @@ void update7SEG ( int index ) {
 			HAL_GPIO_WritePin(EN0_GPIO_Port, EN0_Pin, SET);
 			HAL_GPIO_WritePin(EN2_GPIO_Port, EN2_Pin, SET);
 			HAL_GPIO_WritePin(EN3_GPIO_Port, EN3_Pin, RESET);
-			index = 0;
+			display7SEG(status);
  // Display the forth 7 SEG with led_buffer [3]
 			break ;
 		default :
@@ -260,7 +260,6 @@ int main(void)
 	     /* USER CODE BEGIN 3 */
 	  if(timer0_flag == 1){
 		  setTimer0(1000);
-		  HAL_GPIO_TogglePin(LED_RED_GPIO_Port, LED_RED_Pin);
 	  second++;
 	  if(second >= 60){
 		 second = 0;
@@ -273,15 +272,18 @@ int main(void)
 	  if(hour >= 24){
 	  	 hour = 0;
 	  	 	  }
+
+	  HAL_GPIO_TogglePin(DOT_GPIO_Port, DOT_Pin);
+
 	  int *buffer;
-	  	 buffer = updateClockBuffer(hour, minute);
+
+	  buffer = updateClockBuffer(hour, minute);
 	  	 	  led_buffer[0] = buffer[0];
 	  	 	  led_buffer[1] = buffer[1];
 	  	 	  led_buffer[2] = buffer[2];
 	  	 	  led_buffer[3] = buffer[3];
 	  	  	  }
   	  	  }
-
 	}
   /* USER CODE END 3 */
 
@@ -423,9 +425,20 @@ void Error_Handler(void)
   }
   /* USER CODE END Error_Handler_Debug */
 }
-
+const int MAX_LED = 4;
+int index_led = 0;
+int counter = 25;
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 	timer_run();
+	if(counter <= 0){
+		counter = 25;
+	if(index_led >= MAX_LED ){
+		index_led  = 0;
+	}
+	update7SEG(index_led, led_buffer[index_led]);
+			index_led++;
+	}
+	counter--;
 }
 /* USER CODE END 4 */
 
