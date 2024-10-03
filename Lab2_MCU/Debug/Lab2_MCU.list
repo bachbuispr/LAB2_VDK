@@ -27,25 +27,25 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  11 .ARM.attributes 00000029  00000000  00000000  00004010  2**0
                   CONTENTS, READONLY
- 12 .debug_info   00007c34  00000000  00000000  00004039  2**0
+ 12 .debug_info   00007c2a  00000000  00000000  00004039  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 13 .debug_abbrev 00001619  00000000  00000000  0000bc6d  2**0
+ 13 .debug_abbrev 00001619  00000000  00000000  0000bc63  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_aranges 00000960  00000000  00000000  0000d288  2**3
+ 14 .debug_aranges 00000960  00000000  00000000  0000d280  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_rnglists 0000073d  00000000  00000000  0000dbe8  2**0
+ 15 .debug_rnglists 0000073d  00000000  00000000  0000dbe0  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_macro  000162bd  00000000  00000000  0000e325  2**0
+ 16 .debug_macro  000162bd  00000000  00000000  0000e31d  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   00009a63  00000000  00000000  000245e2  2**0
+ 17 .debug_line   00009a63  00000000  00000000  000245da  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    000820e5  00000000  00000000  0002e045  2**0
+ 18 .debug_str    000820e5  00000000  00000000  0002e03d  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000043  00000000  00000000  000b012a  2**0
+ 19 .comment      00000043  00000000  00000000  000b0122  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  000026ac  00000000  00000000  000b0170  2**2
+ 20 .debug_frame  000026ac  00000000  00000000  000b0168  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 21 .debug_line_str 00000069  00000000  00000000  000b281c  2**0
+ 21 .debug_line_str 00000069  00000000  00000000  000b2814  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -863,12 +863,12 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  int hour = 12,  minute = 4, second = 24;
- 80006bc:	230c      	movs	r3, #12
+  int hour = 23,  minute = 59, second = 55;
+ 80006bc:	2317      	movs	r3, #23
  80006be:	617b      	str	r3, [r7, #20]
- 80006c0:	2304      	movs	r3, #4
+ 80006c0:	233b      	movs	r3, #59	@ 0x3b
  80006c2:	613b      	str	r3, [r7, #16]
- 80006c4:	2318      	movs	r3, #24
+ 80006c4:	2337      	movs	r3, #55	@ 0x37
  80006c6:	60fb      	str	r3, [r7, #12]
   setTimer0(1000);
  80006c8:	f44f 707a 	mov.w	r0, #1000	@ 0x3e8
@@ -876,6 +876,7 @@ int main(void)
   setTimer1(250);
  80006d0:	20fa      	movs	r0, #250	@ 0xfa
  80006d2:	f7ff ff9d 	bl	8000610 <setTimer1>
+  int *buffer;
   int MAX_LED = 4;
  80006d6:	2304      	movs	r3, #4
  80006d8:	607b      	str	r3, [r7, #4]
@@ -890,8 +891,8 @@ int main(void)
  80006de:	4b2a      	ldr	r3, [pc, #168]	@ (8000788 <main+0xe8>)
  80006e0:	681b      	ldr	r3, [r3, #0]
  80006e2:	2b01      	cmp	r3, #1
- 80006e4:	d134      	bne.n	8000750 <main+0xb0>
-	  	  		  setTimer0(1000);
+ 80006e4:	d11f      	bne.n	8000726 <main+0x86>
+		  setTimer0(1000);
  80006e6:	f44f 707a 	mov.w	r0, #1000	@ 0x3e8
  80006ea:	f7ff ff77 	bl	80005dc <setTimer0>
 	  	  	  second++;
@@ -914,9 +915,9 @@ int main(void)
  8000704:	693b      	ldr	r3, [r7, #16]
  8000706:	2b3b      	cmp	r3, #59	@ 0x3b
  8000708:	dd04      	ble.n	8000714 <main+0x74>
-	  	  	  	 second = 0;
+	  	  	  	 minute = 0;
  800070a:	2300      	movs	r3, #0
- 800070c:	60fb      	str	r3, [r7, #12]
+ 800070c:	613b      	str	r3, [r7, #16]
 	  	  	  	 hour++;
  800070e:	697b      	ldr	r3, [r7, #20]
  8000710:	3301      	adds	r3, #1
@@ -930,59 +931,55 @@ int main(void)
  800071a:	2300      	movs	r3, #0
  800071c:	617b      	str	r3, [r7, #20]
 	  	  	  	 	  }
-
 	  	  	  HAL_GPIO_TogglePin(DOT_GPIO_Port, DOT_Pin);
  800071e:	2110      	movs	r1, #16
  8000720:	481a      	ldr	r0, [pc, #104]	@ (800078c <main+0xec>)
  8000722:	f000 fce1 	bl	80010e8 <HAL_GPIO_TogglePin>
-
-	  	  	  int *buffer;
-
-	  	  	  buffer = updateClockBuffer(hour, minute);
- 8000726:	6939      	ldr	r1, [r7, #16]
- 8000728:	6978      	ldr	r0, [r7, #20]
- 800072a:	f7ff ff19 	bl	8000560 <updateClockBuffer>
- 800072e:	6038      	str	r0, [r7, #0]
-	  	  	  	 	  led_buffer[0] = buffer[0];
- 8000730:	683b      	ldr	r3, [r7, #0]
- 8000732:	681b      	ldr	r3, [r3, #0]
- 8000734:	4a16      	ldr	r2, [pc, #88]	@ (8000790 <main+0xf0>)
- 8000736:	6013      	str	r3, [r2, #0]
-	  	  	  	 	  led_buffer[1] = buffer[1];
- 8000738:	683b      	ldr	r3, [r7, #0]
- 800073a:	685b      	ldr	r3, [r3, #4]
- 800073c:	4a14      	ldr	r2, [pc, #80]	@ (8000790 <main+0xf0>)
- 800073e:	6053      	str	r3, [r2, #4]
-	  	  	  	 	  led_buffer[2] = buffer[2];
- 8000740:	683b      	ldr	r3, [r7, #0]
- 8000742:	689b      	ldr	r3, [r3, #8]
- 8000744:	4a12      	ldr	r2, [pc, #72]	@ (8000790 <main+0xf0>)
- 8000746:	6093      	str	r3, [r2, #8]
-	  	  	  	 	  led_buffer[3] = buffer[3];
- 8000748:	683b      	ldr	r3, [r7, #0]
- 800074a:	68db      	ldr	r3, [r3, #12]
- 800074c:	4a10      	ldr	r2, [pc, #64]	@ (8000790 <main+0xf0>)
- 800074e:	60d3      	str	r3, [r2, #12]
 	  	  	  }
 	  if(timer1_flag == 1){
- 8000750:	4b10      	ldr	r3, [pc, #64]	@ (8000794 <main+0xf4>)
- 8000752:	681b      	ldr	r3, [r3, #0]
- 8000754:	2b01      	cmp	r3, #1
- 8000756:	d1c2      	bne.n	80006de <main+0x3e>
+ 8000726:	4b1a      	ldr	r3, [pc, #104]	@ (8000790 <main+0xf0>)
+ 8000728:	681b      	ldr	r3, [r3, #0]
+ 800072a:	2b01      	cmp	r3, #1
+ 800072c:	d1d7      	bne.n	80006de <main+0x3e>
 		  setTimer1(250);
- 8000758:	20fa      	movs	r0, #250	@ 0xfa
- 800075a:	f7ff ff59 	bl	8000610 <setTimer1>
+ 800072e:	20fa      	movs	r0, #250	@ 0xfa
+ 8000730:	f7ff ff6e 	bl	8000610 <setTimer1>
 		  if(index >= MAX_LED){
- 800075e:	68ba      	ldr	r2, [r7, #8]
- 8000760:	687b      	ldr	r3, [r7, #4]
- 8000762:	429a      	cmp	r2, r3
- 8000764:	db01      	blt.n	800076a <main+0xca>
+ 8000734:	68ba      	ldr	r2, [r7, #8]
+ 8000736:	687b      	ldr	r3, [r7, #4]
+ 8000738:	429a      	cmp	r2, r3
+ 800073a:	db01      	blt.n	8000740 <main+0xa0>
 			  index = 0;
- 8000766:	2300      	movs	r3, #0
- 8000768:	60bb      	str	r3, [r7, #8]
+ 800073c:	2300      	movs	r3, #0
+ 800073e:	60bb      	str	r3, [r7, #8]
 		  }
+		  buffer = updateClockBuffer(hour, minute);
+ 8000740:	6939      	ldr	r1, [r7, #16]
+ 8000742:	6978      	ldr	r0, [r7, #20]
+ 8000744:	f7ff ff0c 	bl	8000560 <updateClockBuffer>
+ 8000748:	6038      	str	r0, [r7, #0]
+		  	  	  	  	 	  led_buffer[0] = buffer[0];
+ 800074a:	683b      	ldr	r3, [r7, #0]
+ 800074c:	681b      	ldr	r3, [r3, #0]
+ 800074e:	4a11      	ldr	r2, [pc, #68]	@ (8000794 <main+0xf4>)
+ 8000750:	6013      	str	r3, [r2, #0]
+		  	  	  	  	 	  led_buffer[1] = buffer[1];
+ 8000752:	683b      	ldr	r3, [r7, #0]
+ 8000754:	685b      	ldr	r3, [r3, #4]
+ 8000756:	4a0f      	ldr	r2, [pc, #60]	@ (8000794 <main+0xf4>)
+ 8000758:	6053      	str	r3, [r2, #4]
+		  	  	  	  	 	  led_buffer[2] = buffer[2];
+ 800075a:	683b      	ldr	r3, [r7, #0]
+ 800075c:	689b      	ldr	r3, [r3, #8]
+ 800075e:	4a0d      	ldr	r2, [pc, #52]	@ (8000794 <main+0xf4>)
+ 8000760:	6093      	str	r3, [r2, #8]
+		  	  	  	  	 	  led_buffer[3] = buffer[3];
+ 8000762:	683b      	ldr	r3, [r7, #0]
+ 8000764:	68db      	ldr	r3, [r3, #12]
+ 8000766:	4a0b      	ldr	r2, [pc, #44]	@ (8000794 <main+0xf4>)
+ 8000768:	60d3      	str	r3, [r2, #12]
 		  update7SEG(index, led_buffer[index]);
- 800076a:	4a09      	ldr	r2, [pc, #36]	@ (8000790 <main+0xf0>)
+ 800076a:	4a0a      	ldr	r2, [pc, #40]	@ (8000794 <main+0xf4>)
  800076c:	68bb      	ldr	r3, [r7, #8]
  800076e:	f852 3023 	ldr.w	r3, [r2, r3, lsl #2]
  8000772:	4619      	mov	r1, r3
@@ -998,8 +995,8 @@ int main(void)
  8000784:	2000002c 	.word	0x2000002c
  8000788:	20000098 	.word	0x20000098
  800078c:	40010800 	.word	0x40010800
- 8000790:	20000084 	.word	0x20000084
- 8000794:	200000a0 	.word	0x200000a0
+ 8000790:	200000a0 	.word	0x200000a0
+ 8000794:	20000084 	.word	0x20000084
 
 08000798 <SystemClock_Config>:
 /**

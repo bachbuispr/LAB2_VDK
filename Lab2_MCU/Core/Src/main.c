@@ -265,9 +265,10 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  int hour = 12,  minute = 4, second = 24;
+  int hour = 23,  minute = 59, second = 55;
   setTimer0(1000);
   setTimer1(250);
+  int *buffer;
   int MAX_LED = 4;
   int index = 0;
   while (1)
@@ -275,35 +276,31 @@ int main(void)
     /* USER CODE END WHILE */
 	  /*USER CODE BEGIN 3 */
 	  if(timer0_flag == 1){
-	  	  		  setTimer0(1000);
+		  setTimer0(1000);
 	  	  	  second++;
 	  	  	  if(second >= 60){
 	  	  		 second = 0;
 	  	  	  	 minute++;
 	  	  	  	 	  }
 	  	  	  if(minute >= 60){
-	  	  	  	 second = 0;
+	  	  	  	 minute = 0;
 	  	  	  	 hour++;
 	  	  	  	 	  }
 	  	  	  if(hour >= 24){
 	  	  	  	 hour = 0;
 	  	  	  	 	  }
-
 	  	  	  HAL_GPIO_TogglePin(DOT_GPIO_Port, DOT_Pin);
-
-	  	  	  int *buffer;
-
-	  	  	  buffer = updateClockBuffer(hour, minute);
-	  	  	  	 	  led_buffer[0] = buffer[0];
-	  	  	  	 	  led_buffer[1] = buffer[1];
-	  	  	  	 	  led_buffer[2] = buffer[2];
-	  	  	  	 	  led_buffer[3] = buffer[3];
 	  	  	  }
 	  if(timer1_flag == 1){
 		  setTimer1(250);
 		  if(index >= MAX_LED){
 			  index = 0;
 		  }
+		  buffer = updateClockBuffer(hour, minute);
+		  	  	  	  	 	  led_buffer[0] = buffer[0];
+		  	  	  	  	 	  led_buffer[1] = buffer[1];
+		  	  	  	  	 	  led_buffer[2] = buffer[2];
+		  	  	  	  	 	  led_buffer[3] = buffer[3];
 		  update7SEG(index, led_buffer[index]);
 		  index++;
 	  }
