@@ -318,6 +318,16 @@ void updateLEDMatrix(int index) {
 		break;
 	}
 }
+
+
+void ledMatrixEffect() {
+	//This functions aims to shift left the 'A' text
+	int i;
+	for (i = 0; i < 8; i++) {
+		matrix_buffer[i] = (matrix_buffer[i] >> 1) + (matrix_buffer[i] << 7);
+	}
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -399,13 +409,13 @@ int main(void)
 		  index++;
 	  }
 //	  Led_matrix display
-	  		if (timer2_flag == 1) {
+	  if (timer2_flag == 1) {
 	  			//set timer2 = 0.01s
-	  			setTimer2(25);
+	  			setTimer2(10);
 	  			if (led_matrix_index >= 8) {
 	  				led_matrix_index = 0;
+	  				ledMatrixEffect();
 	  			}
-	  			clearLEDMatrix();
 	  			updateLEDMatrix(led_matrix_index++);
 	  		}
 	    }
